@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>注册</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<link rel="stylesheet" href="css/register.css">
+	<!--导入jquery-->
+	<script src="js/jquery-3.3.1.js"></script>
+
+	<script>
+
+		/*	
+			表单验证：
+				1.用户名和密码
+				2.Email右键
+				3.姓名
+				4.手机号
+				5.验证码
+		*/
+
+		//用户名
+		function checkUsername() {
+			//1.获取用户名
+			var username = $("#username").val();
+			//2.正则表达式(4-16位，字母、数字、下划线、减号)
+			var reg_username = /^[a-zA-Z0-9_-]{6,16}$/;
+			//3.判断
+			var flag = reg_username.test(username);
+			if (flag) {
+				//合法
+				$("#td_checkUsername").css({
+					color: 'green',
+					display: 'block'
+				});
+				$("#td_checkUsername").html("用户名符合要求");
+				$("#username").css("border", "");
+			}
+			else {
+				//不合法
+				$("#td_checkUsername").css({
+					color: 'red',
+					display: 'block'
+				});
+				$("#td_checkUsername").html("此用户名不合法");
+				$("#username").css("border", "1px solid red");
+			}
+			return flag;
+		}
+
+		//密码
+		function checkPassword() {
+			//1.获取密码
+			var password = $("#password").val();
+			//2.正则表达式(最少六位，至少包括一个大写字母，一个小写字母，一个数字)
+			var reg_password = /^\S*(?=\S{6,})(?=\S*\d)(?=\S*[A-Z])(?=\S*[a-z])\S*$/;
+			//3.判断
+			var flag = reg_password.test(password);
+			if (flag) {
+				//合法
+				$("#td_checkPassword").css({
+					color: 'green',
+					display: 'block'
+				});
+				$("#td_checkPassword").html("密码符合要求");
+				$("#password").css("border", "");
+			}
+			else {
+				//不合法
+				$("#td_checkPassword").css({
+					color: 'red',
+					display: 'block'
+				});
+				$("#td_checkPassword").html("最少六位，至少包括一个大写字母，一个小写字母，一个数字");
+				$("#password").css("border", "1px solid red");
+			}
+			return flag;
+		}
+
+		//电子邮箱
+		function checkEmail() {
+			//1.获取邮箱
+			var email = $("#email").val();
+			//2.正则表达式(电子邮箱)
+			var reg_email = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+			//3.判断
+			var flag = reg_email.test(email);
+			if (flag) {
+				//合法情况
+				$("#td_checkEmail").css({
+					color: 'green',
+					display: 'block'
+				});
+				$("#td_checkEmail").html("邮箱符合要求");
+				$("#email").css("border", "");
+			}
+			else {
+				//不合法
+				$("#td_checkEmail").css({
+					color: 'red',
+					display: 'block'
+				});
+				$("#td_checkEmail").html("请输入正确的邮箱");
+				$("#email").css("border", "1px solid red");
+			}
+			return flag;
+		}
+
+		//姓名
+		function checkName() {
+			//1.获取姓名
+			var name = $("#name").val();
+			//2.正则表达式(姓名)
+			var reg_name = /^(?:[\u4e00-\u9fa5·]{2,16})$/;
+			//3.判断
+			var flag = reg_name.test(name);
+			if (flag) {
+				//合法情况
+				$("#td_checkName").css({
+					color: 'green',
+					display: 'block'
+				});
+				$("#td_checkName").html("姓名符合要求");
+				$("#name").css("border", "");
+			}
+			else {
+				//不合法
+				$("#td_checkName").css({
+					color: 'red',
+					display: 'block'
+				});
+				$("#td_checkName").html("请输入正确的中文名称");
+				$("#name").css("border", "1px solid red");
+			}
+			return flag;
+		}
+
+		//手机号
+		function checkTelephone() {
+			//1.获取手机号
+			var telephone = $("#telephone").val();
+			//2.正则表达式(手机号只要是13、14、15、16、17、18、19开头的都可以)
+			var reg_telephone = /^(?:(?:\+|00)86)?1(?:(?:3[\d])|(?:4[5-7|9])|(?:5[0-3|5-9])|(?:6[5-7])|(?:7[0-8])|(?:8[\d])|(?:9[1|8|9]))\d{8}$/;
+			//3.判断
+			var flag = reg_telephone.test(telephone);
+			if (flag) {
+				//合法情况
+				$("#td_checkTelephone").css({
+					color: 'green',
+					display: 'block'
+				});
+				$("#td_checkTelephone").html("手机号符合要求");
+				$("#telephone").css("border", "");
+			}
+			else {
+				//不合法
+				$("#td_checkTelephone").css({
+					color: 'red',
+					display: 'block'
+				});
+				$("#td_checkTelephone").html("请输入正确的手机号");
+				$("#telephone").css("border", "1px solid red");
+			}
+			return flag;
+		}
+
+		$(function () {
+			//校验工序：当表单提交时，调用所有校验方法
+			$("#registerForm").submit(function () {
+				//1.发送数据到服务器
+				if (checkUsername() && checkPassword() && checkEmail() && checkName() && checkTelephone()) {
+					$.post("user/regist", $(this).serialize(), function (data) {
+						//处理服务器响应的数据 data
+						if (data.flag) {
+							//注册成功，跳转成功页面
+							location.href = "register_ok.html";
+						} else {
+							//注册失败,给errorMsg添加提示信息
+							//验证码错误的情况
+							if (data.errorMsg === "验证码错误！") {
+								$("#td_checkCheck").css({
+									color: 'red',
+									display: 'block'
+								});
+								$("#td_checkCheck").html(data.errorMsg);
+								$("#check").css("border", "1px solid red");
+							}
+							//用户名存在的情况
+							else if (data.errorMsg === "注册失败！") {
+								$("#td_checkUsername").css({
+									color: 'red',
+									display: 'block'
+								});
+								$("#td_checkUsername").html("注册失败，用户名已存在");
+								$("#username").css("border", "1px solid red");
+							}
+						}
+					});
+				}
+				//2.跳转页面
+				return false;
+			});
+			//当某一失去焦点时，调用检验方法
+			$("#username").blur(checkUsername);
+			$("#password").blur(checkPassword);
+			$("#email").blur(checkEmail);
+			$("#name").blur(checkName);
+			$("#telephone").blur(checkTelephone);
+
+		});
+
+
+
+	</script>
+
+</head>
+
+<body>
+	<!--引入头部-->
+	<div id="header"></div>
+	<!-- 头部 end -->
+	<div class="rg_layout">
+		<div class="rg_form clearfix">
+			<div class="rg_form_left">
+				<p>新用户注册</p>
+				<p>USER REGISTER</p>
+			</div>
+			<div class="rg_form_center">
+
+				<!--注册表单-->
+				<form id="registerForm" action=" User">
+					<!--提交处理请求的标识符-->
+					<input type="hidden" name="action" value="register">
+					<table style="margin-top: 25px;">
+						<tr>
+							<td class="td_left">
+								<label for="username">用户名</label>
+							</td>
+							<td class="td_right">
+								<input type="text" id="username" name="username" placeholder="请输入账号">
+							</td>
+							<td class="td_check">
+								<div id="td_checkUsername"></div>
+							</td>
+						</tr>
+						<tr>
+							<td class="td_left">
+								<label for="password">密码</label>
+							</td>
+							<td class="td_right">
+								<input type="password" id="password" name="password" placeholder="请输入密码">
+							</td>
+							<td class="td_check">
+								<span id="td_checkPassword"></span>
+							</td>
+						</tr>
+						<tr>
+							<td class="td_left">
+								<label for="email">Email</label>
+							</td>
+							<td class="td_right">
+								<input type="text" id="email" name="email" placeholder="请输入Email">
+							</td>
+							<td class="td_check">
+								<span id="td_checkEmail"></span>
+							</td>
+						</tr>
+						<tr>
+							<td class="td_left">
+								<label for="name">姓名</label>
+							</td>
+							<td class="td_right">
+								<input type="text" id="name" name="name" placeholder="请输入真实姓名">
+							</td>
+							<td class="td_check">
+								<span id="td_checkName"></span>
+							</td>
+						</tr>
+						<tr>
+							<td class="td_left">
+								<label for="telephone">手机号</label>
+							</td>
+							<td class="td_right">
+								<input type="text" id="telephone" name="telephone" placeholder="请输入您的手机号">
+							</td>
+							<td class="td_check">
+								<span id="td_checkTelephone"></span>
+							</td>
+						</tr>
+						<tr>
+							<td class="td_left">
+								<label for="sex">性别</label>
+							</td>
+							<td class="td_right gender">
+								<input type="radio" id="sex" name="sex" value="男" checked> 男
+								<input type="radio" name="sex" value="女"> 女
+							</td>
+						</tr>
+						<tr>
+							<td class="td_left">
+								<label for="birthday">出生日期</label>
+							</td>
+							<td class="td_right">
+								<input type="date" id="birthday" name="birthday" placeholder="年/月/日">
+							</td>
+						</tr>
+						<tr>
+							<td class="td_left">
+								<label for="check">验证码</label>
+							</td>
+							<td class="td_right check">
+								<input type="text" id="check" name="check" class="check">
+								<img src="checkCode" height="32px" alt="" onclick="changeCheckCode(this)">
+								<script type="text/javascript">
+									//图片点击事件
+									function changeCheckCode(img) {
+										img.src = "checkCode?" + new Date().getTime();
+									}
+								</script>
+							</td>
+							<td class="td_check">
+								<span id="td_checkCheck"></span>
+							</td>
+						</tr>
+						<tr>
+							<td class="td_left">
+							</td>
+							<td class="td_right check">
+								<input type="submit" class="submit" value="注册">
+								<span id="msg" style="color: red;"></span>
+							</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<div class="rg_form_right">
+				<p>
+					已有账号？
+					<a href="#">立即登录</a>
+				</p>
+			</div>
+		</div>
+	</div>
+	<!--引入尾部-->
+	<div id="footer"></div>
+	<!--导入布局js，共享header和footer-->
+	<script type="text/javascript" src="js/include.js"></script>
+
+</body>
+
+</html>
